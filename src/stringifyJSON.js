@@ -5,6 +5,7 @@
 
 var stringifyJSON = function(obj) {
   var result = '';
+  var resultNotUndefined = false;
   const helper = (obj) => {
     if (typeof obj === 'number') {
       result += obj;
@@ -18,18 +19,43 @@ var stringifyJSON = function(obj) {
       result += '[]';
     } else if (!Array.isArray(obj) && typeof obj === 'object' && Object.keys(obj).length === 0) {
       result += '{}';
+    } else if (Array.isArray(obj) && obj.length !== 0) {
+      for (var i = 0; i < obj.length; i++) {
+        if (i === 0) {
+          result += '[';
+        }
+        // console.log(obj[i]);
+        helper(obj[i]);
+        if (i !== obj.length - 1) {
+          result += ',';
+        }
+        if (i === obj.length - 1) {
+          result += ']';
+        }
+      }
+    } else if (typeof obj === 'object' && Object.keys(obj).length !== 0) {
+      for (var i = 0; i < Object.keys(obj).length; i++) {
+        if (i === 0) {
+          result += '{';
+        }
+        result += `"${Object.keys(obj)[i]}":`;
+        if (obj[Object.keys(obj)[i]] === undefined || typeof obj[Object.keys(obj)[i]] === 'function') {
+          resultNotUndefined = true;
+          return undefined;
+        }
+        helper(obj[Object.keys(obj)[i]]);
+        if (i !== Object.keys(obj).length - 1) {
+          result += ',';
+        }
+        if (i === Object.keys(obj).length - 1) {
+          result += '}';
+        }
+      }
     }
-
-
 
   };
   helper(obj);
-  return result;
+  console.log(result);
+  return (resultNotUndefined) ? undefined : result;
 };
 
-
-var testToString = [1, 2, 'hi', true];
-var testNumToString = 1;
-var testStringToString = 'hello world';
-console.log(stringifyJSON (testNumToString));
-console.log(typeof null);
